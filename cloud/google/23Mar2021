@@ -1,0 +1,12 @@
+Overview of VPC Service Controls
+VPC Service Controls enables broader context-based perimeter security, including controlling data egress across the perimeter.
+
+For all Google Cloud services secured with VPC Service Controls, you can ensure that:
+
+1. Resources within a perimeter are accessed only from clients within authorized VPC networks using Private Google Access with either Google Cloud or on-premises.
+
+2. Clients within a perimeter that have private access to resources do not have access to unauthorized (potentially public) resources outside the perimeter.
+
+3. Data cannot be copied to unauthorized resources outside the perimeter using service operations such as gsutil cp or bq mk.
+
+4. When enabled, internet access to resources within a perimeter is restricted using whitelisted IPv4 and IPv6 ranges.
