@@ -107,4 +107,8 @@ Load testing determined that our backend server can handle about 100 queries per
 During updates, one task at a time will be unavailable, leaving 36 tasks.
 A machine failure might occur during a task update, leaving only 35 tasks, just enough to serve peak load
 
-## Sush to continue from here - https://sre.google/sre-book/part-II-principles/
+## Chapter 3 - Embracing Risk
+Put simply, a user on a 99% reliable smartphone cannot tell the difference between 99.99% and 99.999% service reliability! With this in mind, rather than simply maximizing uptime, Site Reliability Engineering seeks to balance the risk of unavailability with the goals of rapid innovation and efficient service operations, so that users’ overall happiness—with features, service, and performance—is optimized.
+
+### Managing Risk
+### Sush read from here - https://sre.google/sre-book/embracing-risk/
