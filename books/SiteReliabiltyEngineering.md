@@ -108,7 +108,16 @@ During updates, one task at a time will be unavailable, leaving 36 tasks.
 A machine failure might occur during a task update, leaving only 35 tasks, just enough to serve peak load
 
 ## Chapter 3 - Embracing Risk
+Extreme reliability comes at a cost: maximizing stability limits how fast new features can be developed and how quickly products can be delivered to users, and dramatically increases their cost, which in turn reduces the numbers of features a team can afford to offer.
 Put simply, a user on a 99% reliable smartphone cannot tell the difference between 99.99% and 99.999% service reliability! With this in mind, rather than simply maximizing uptime, Site Reliability Engineering seeks to balance the risk of unavailability with the goals of rapid innovation and efficient service operations, so that users’ overall happiness—with features, service, and performance—is optimized.
+Site Reliability Engineering seeks to balance the risk of unavailability with the goals of rapid innovation and efficient service operations, so that users’ overall happiness—with features, service, and performance—is optimized.
 
 ### Managing Risk
+cost does not increase linearly as reliability increments -an incremental improvement in reliability may cost 100x more than the previous increment. The costliness has two dimensions:
+#### The cost of redundant machine/compute resources
+Addition of redundant resources helps making systems more reliable at the same time it comes with additional cost.
+#### The opportunity cost
+engineers no longer work on new features and products for end users as they are focussed on features that diminish risk
+
+
 ### Sush read from here - https://sre.google/sre-book/embracing-risk/
