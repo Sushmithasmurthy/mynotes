@@ -119,5 +119,75 @@ Addition of redundant resources helps making systems more reliable at the same t
 #### The opportunity cost
 engineers no longer work on new features and products for end users as they are focussed on features that diminish risk
 
+### Measuring Service Risk
 
-### Sush read from here - https://sre.google/sre-book/embracing-risk/
+* For most services, the most straightforward way of representing risk tolerance is in terms of the acceptable level of unplanned downtime.
+* Unplanned downtime is captured by the desired level of service availability, usually expressed in terms of the number of "nines"- 99.9%, 99.99%, or 99.999% availability.
+* Each additional nine corresponds to an order of magnitude improvement toward 100% availability.
+
+#### Time Based Availability
+**Time Based Availability = uptime/ (uptime + downtime)**
+Using this formula over the period of a year, we can calculate the acceptable number of minutes of downtime to reach a given number of nines of availability. For example, a system with an availability target of 99.99% can be down for up to 52.56 minutes in a year and stay within its availability target; see Availability Table for a table.
+
+#### Aggregate availability
+At Google, however, a time-based metric for availability is usually not meaningful because we are looking across globally distributed services. Our approach to fault isolation makes it very likely that we are serving at least a subset of traffic for a given service somewhere in the world at any given time (i.e., we are at least partially "up" at all times). Therefore, instead of using metrics around uptime, we define availability in terms of the request success rate. Aggregate availability shows how this yield-based metric is calculated over a rolling window (i.e., proportion of successful requests over a one-day window).
+**Aggregate availability = successful requests/total requests**
+For example, a system that serves 2.5M requests in a day with a daily availability target of 99.99% can serve up to 250 errors and still hit its target for that given day.
+
+### Risk Tolerance of Services
+
+#### Identifying the Risk Tolerance of Consumer Services
+
+When a product team exists, that team is usually the best resource to discuss the reliability requirements for a service. In the absence of a dedicated product team, the engineers building the system often play this role either knowingly or unknowingly.
+
+##### Types of failures
+Which is worse for the service: a constant low rate of failures, or an occasional full-site outage? 
+Both types of failure may result in the same absolute number of errors, but may have vastly different **impacts** on the business.
+
+##### Cost
+* If we were to operate and build these systems at one more nine of availability, what would our incremental rise in revenue be.
+* Does this additional revenue offset the cost of reaching that level of availability
+
+
+#### Identifying the Risk Tolerance of Infrastructure Services
+##### Target level of availability
+Consider Bigtable [Cha06], a massive-scale distributed storage system for structured data. Some consumer services serve data directly from Bigtable in the path of a user request. Such services need low latency and high reliability. Other teams use Bigtable as a repository for data that they use to perform offline analysis (e.g., MapReduce) on a regular basis. These teams tend to be more concerned about throughput than reliability. Risk tolerance for these two use cases is quite distinct.
+
+One approach to meeting the needs of both use cases is to engineer all infrastructure services to be ultra-reliable. Given the fact that these infrastructure services also tend to aggregate huge amounts of resources, such an approach is usually far too expensive in practice
+
+##### Types of failures
+The low-latency user wants Bigtable’s request queues to be (almost always) empty so that the system can process each outstanding request immediately upon arrival.
+The user concerned with offline analysis is more interested in system throughput(number of requests served per unit time),
+As you can see, success and failure are **antithetical** for these sets of users. Success for the low-latency user is failure for the user concerned with offline analysis.
+
+#### Cost
+Partition infrastructure and offer it at multiple independent levels of service. In the Bigtable example, we can build two types of clusters: low-latency clusters and throughput clusters
+
+The key strategy with regards to infrastructure is to deliver services with explicitly delineated levels of service thus enabling the clients to make the right risk and cost trade-offs when building their systems.
+
+## Motivation for Error Budgets
+
+* Product development performance is largely evaluated on product velocity, which creates an incentive to push new code as quickly as possible.
+* SRE performance is (unsurprisingly) evaluated based upon reliability of a service, which implies an incentive to push back against a high rate of change.
+(Indeed, Google SRE’s unofficial motto is "Hope is not a strategy.") Instead, our goal is to define an objective metric, agreed upon by both sides, that can be used to guide the negotiations in a reproducible way. The more data-based the decision can be, the better.
+#### Software fault tolerance
+  How hardened do we make the software to unexpected events? Too little, and we have a brittle, unusable product. Too much, and we have a product no one wants to use (but that runs very stably).
+#### Testing
+  Again, not enough testing and you have embarrassing outages, privacy data leaks, or a number of other press-worthy events. Too much testing, and you might lose your market.
+#### Push frequency
+  Every push is risky. How much should we work on reducing that risk, versus doing other work?
+#### Canary duration and size
+  It’s a best practice to test a new release on some small subset of a typical workload, a practice often called canarying. How long do we wait, and how big is the canary?
+
+### Forming Your Error Budget
+Our practice is then as follows:
+
+Product Management defines an SLO, which sets an expectation of how much uptime the service should have per quarter.
+The actual uptime is measured by a neutral third party: our monitoring system.
+The difference between these two numbers is the "budget" of how much "unreliability" is remaining for the quarter.
+As long as the uptime measured is above the SLO—in other words, as long as there is error budget remaining—new releases can be pushed.
+For example, imagine that a service’s SLO is to successfully serve 99.999% of all queries per quarter. This means that the service’s error budget is a failure rate of 0.001% for a given quarter. If a problem causes us to fail 0.0002% of the expected queries for the quarter, the problem spends 20% of the service’s quarterly error budget.
+
+### Benefits
+The main benefit of an error budget is that it provides a common incentive that allows both product development and SRE to focus on finding the right balance between innovation and reliability.
+Many products use this control loop to manage release velocity: as long as the system’s SLOs are met, releases can continue. If SLO violations occur frequently enough to expend the error budget, releases are temporarily halted while additional resources are invested in system testing and development to make the system more resilient, improve its performance, and so on. More subtle and effective approaches are available than this simple on/off technique:15 for instance, slowing down releases or rolling them back when the SLO-violation error budget is close to being used up.
