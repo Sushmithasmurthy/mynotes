@@ -7,3 +7,11 @@ As you can see, success and failure are **antithetical** for these sets of users
 * ubiquitous - present, appearing, or found everywhere.
 Example usage -
 Achieved through efficiencies and cost savings by utilizing **ubiquitous** connectivity that is available as commodity hardware and readily available as a service.
+
+* obscure - keep from being seen; conceal.
+Example usage -
+Most metrics are better thought of as distributions rather than averages. As simple average can obscure these tail latencies
+
+* fallacy - a mistaken belief, especially one based on unsound argument.
+Example usage - 
+"the notion that the camera never lies is a fallacy"

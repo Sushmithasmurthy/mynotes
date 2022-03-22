@@ -218,4 +218,44 @@ An SLO is a service level objective: a target value or range of values for a ser
 Finally, SLAs are service level agreements: an explicit or implicit contract with your users that includes consequences of meeting (or missing) the SLOs they contain. The consequences are most easily recognized when they are financial—a rebate or a penalty—but they can take other forms. An easy way to tell the difference between an SLO and an SLA is to ask "what happens if the SLOs aren’t met?": if there is no explicit consequence, then you are almost certainly looking at an SLO.
 SRE doesn’t typically get involved in constructing SLAs, because SLAs are closely tied to business and product decisions. SRE does, however, get involved in helping to avoid triggering the consequences of missed SLOs. They can also help to define the SLIs: there obviously needs to be an objective way to measure the SLOs in the agreement, or disagreements will arise.
 
-### Sush continue from here - https://sre.google/sre-book/service-level-objectives/ - Indicators in Practice
+### Indicators in Practice
+
+#### What Do You and Your Users Care About
+Services tend to fall into a few broad categories in terms of the SLIs they find relevant:
+
+* **User-facing serving systems,** such as the Shakespeare search frontends, generally care about availability, latency, and throughput. In other words: Could we respond to the request? How long did it take to respond? How many requests could be handled?
+* **Storage systems** often emphasize latency, availability, and durability. In other words: How long does it take to read or write data? Can we access the data on demand? Is the data still there when we need it? See Data Integrity: What You Read Is What You Wrote for an extended discussion of these issues.
+* **Big data systems**, such as data processing pipelines, tend to care about throughput and end-to-end latency. In other words: How much data is being processed? How long does it take the data to progress from ingestion to completion? (Some pipelines may also have targets for latency on individual processing stages.)
+* **All systems** should care about correctness: was the right answer returned, the right data retrieved, the right analysis done? Correctness is important to track as an indicator of system health, even though it’s often a property of the data in the system rather than the infrastructure per se, and so usually not an SRE responsibility to meet.
+
+#### Collecting Indicators
+Many indicator metrics are most naturally gathered on the server side, using a monitoring system such as Borgmon (see Practical Alerting from Time-Series Data) or Prometheus, or with periodic log analysis—for instance, HTTP 500 responses as a fraction of all requests.
+
+#### Aggregation
+Most metrics are better thought of as **distributions** rather than averages.For example, for a latency SLI, some requests will be serviced quickly, while others will invariably take longer—sometimes much longer. A simple average can obscure these tail latencies, as well as changes in them. Figure 4-1 provides an example: although a typical request is served in about 50 ms, 5% of requests are 20 times slower! Monitoring and alerting based only on the average latency would show no change in behavior over the course of the day, when there are in fact significant changes in the tail latency (the topmost line).
+User studies have shown that people typically prefer a slightly slower system to one with high variance in response time.
+Using percentiles for indicators allows you to consider the shape of the distribution and its differing attributes: a high-order percentile, such as the 99th or 99.9th, shows you a plausible worst-case value, while using the 50th percentile (also known as the median) emphasizes the typical case. The higher the variance in response times, the more the typical user experience is affected by long-tail behavior, an effect exacerbated at high load by queuing effects. User studies have shown that people typically prefer a slightly slower system to one with high variance in response time, so some SRE teams focus only on high percentile values, on the grounds that if the 99.9th percentile behavior is good, then the typical experience is certainly going to be.
+##### Note: 
+Percentile Formula [[from thoughtco article](<https://www.thoughtco.com/what-is-a-percentile-3126238#:~:text=Percentiles%20can%20be%20calculated%20using,rank%20of%20a%20given%20value.&text=Percentiles%20are%20frequently%20used%20to%20understand%20test%20scores%20and%20biometric%20measurements>.)]
+
+* Percentiles for the values in a given data set can be calculated using the formula: 
+* `n = (P/100) x N`
+* where N = number of values in the data set, P = percentile, and n = ordinal rank of a given value (with the values in the data set sorted from smallest to largest). For example, take a class of 20 students that earned the following scores on their most recent test: 75, 77, 78, 78, 80, 81, 81, 82, 83, 84, 84, 84, 85, 87, 87, 88, 88, 88, 89, 90. These scores can be represented as a data set with 20 values: {75, 77, 78, 78, 80, 81, 81, 82, 83, 84, 84, 84, 85, 87, 87, 88, 88, 88, 89, 90}.
+* We can find the score that marks the 20th percentile by plugging in known values into the formula and solving for n:
+* n = (20/100) x 20
+* n = 4
+* The fourth value in the data set is the score 78. This means that 78 marks the 20th percentile; of the students in the class, 20 percent earned a score of 78 or lower.
+
+#### Standardize Indicators
+We recommend that you standardize on common definitions for SLIs so that you don’t have to reason about them from first principles each time. Any feature that conforms to the standard definition templates can be omitted from the specification of an individual SLI, e.g.:
+* Aggregation intervals: “Averaged over 1 minute”
+* Aggregation regions: “All the tasks in a cluster”
+* How frequently measurements are made: “Every 10 seconds”
+* Which requests are included: “HTTP GETs from black-box monitoring jobs”
+* How the data is acquired: “Through our monitoring, measured at the server”
+* Data-access latency: “Time to last byte”
+To save effort, build a set of reusable SLI templates for each common metric; these also make it simpler for everyone to understand what a specific SLI means.
+
+#### Objectives in Practice
+Start by thinking about (or finding out!) what your users care about, not what you can measure. Often, what your users care about is difficult or impossible to measure, so you’ll end up approximating users’ needs in some way.
+working from desired objectives backward to specific indicators works better than choosing indicators and then coming up with targets.
