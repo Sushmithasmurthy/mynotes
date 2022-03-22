@@ -192,4 +192,30 @@ For example, imagine that a service’s SLO is to successfully serve 99.999% of 
 The main benefit of an error budget is that it provides a common incentive that allows both product development and SRE to focus on finding the right balance between innovation and reliability.
 Many products use this control loop to manage release velocity: as long as the system’s SLOs are met, releases can continue. If SLO violations occur frequently enough to expend the error budget, releases are temporarily halted while additional resources are invested in system testing and development to make the system more resilient, improve its performance, and so on. More subtle and effective approaches are available than this simple on/off technique:15 for instance, slowing down releases or rolling them back when the SLO-violation error budget is close to being used up.
 
-### Sush read from here - https://sre.google/sre-book/service-level-objectives/
+## Chapter 4 - Service Level Objectives
+
+Choosing appropriate metrics helps to drive the right action if something goes wrong, and also gives an SRE team confidence that a service is healthy.
+* Service Level Indicators(SLI)
+* Service Level Objectives(SLO)
+* Service Level Agreements(SLA)
+
+### Service Level Terminology
+
+#### Indicators(SLI) 
+An SLI is a service level indicator—a carefully defined quantitative measure of some aspect of the level of service that is provided.
+* Most services consider the below as common SLIs
+  * **request latency**—how long it takes to return a response to a request—as a key SLI.
+  * **error rate**, often expressed as a fraction of all requests received, and 
+  * **system throughput**, typically measured in requests per second. 
+  * **availability** -fraction of the time that a service is usable. It is often defined in terms of the fraction of well-formed requests that succeed, sometimes called yield.
+  * **Durability**—the likelihood that data will be retained over a long period of time—is equally important for data storage systems.
+The measurements are often aggregated: i.e., raw data is collected over a measurement window and then turned into a rate, average, or percentile.availabilities of 99% and 99.999% can be referred to as "2 nines" and "5 nines" availability, respectively, and the current published target for Google Compute Engine availability is “three and a half nines”—99.95% availability.
+
+#### Objectives(SLO)
+An SLO is a service level objective: a target value or range of values for a service level that is measured by an SLI. A natural structure for SLOs is thus SLI ≤ target, or lower bound ≤ SLI ≤ upper bound. 
+
+#### Agreements(SLA)
+Finally, SLAs are service level agreements: an explicit or implicit contract with your users that includes consequences of meeting (or missing) the SLOs they contain. The consequences are most easily recognized when they are financial—a rebate or a penalty—but they can take other forms. An easy way to tell the difference between an SLO and an SLA is to ask "what happens if the SLOs aren’t met?": if there is no explicit consequence, then you are almost certainly looking at an SLO.
+SRE doesn’t typically get involved in constructing SLAs, because SLAs are closely tied to business and product decisions. SRE does, however, get involved in helping to avoid triggering the consequences of missed SLOs. They can also help to define the SLIs: there obviously needs to be an objective way to measure the SLOs in the agreement, or disagreements will arise.
+
+### Sush continue from here - https://sre.google/sre-book/service-level-objectives/ - Indicators in Practice
