@@ -259,3 +259,9 @@ To save effort, build a set of reusable SLI templates for each common metric; th
 #### Objectives in Practice
 Start by thinking about (or finding out!) what your users care about, not what you can measure. Often, what your users care about is difficult or impossible to measure, so you’ll end up approximating users’ needs in some way.
 working from desired objectives backward to specific indicators works better than choosing indicators and then coming up with targets.
+
+
+## Chapter 5 Eliminating Toil
+
+## Chapter 6 Monitoring Distributed Systems
+start from here Chapter 6 - https://sre.google/sre-book/monitoring-distributed-systems/
