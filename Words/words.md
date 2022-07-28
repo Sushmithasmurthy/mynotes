@@ -15,3 +15,7 @@ Most metrics are better thought of as distributions rather than averages. As sim
 * fallacy - a mistaken belief, especially one based on unsound argument.
 Example usage - 
 "the notion that the camera never lies is a fallacy"
+
+* axiom - a statement or proposition which is regarded as being established, accepted, or self-evidently true.
+  "the axiom that sport builds character"
+Example Usage - If I really wanted to understand this axiom, I figured, I needed to understand the people who live their lives by it.
